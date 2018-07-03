@@ -1,0 +1,147 @@
+#!/usr/bin/env groovy
+import static java.lang.System.exit
+
+println("trigger commit-msg")
+// First argument is the name of the
+// temporary commit message file.COMMIT_EDITMSG
+/**
+ * 这个钩子的唯一参数：包含提交信息的文件名，通过args[0]获取
+ */
+def msgFileName = args[0]
+
+// Get the commit message file.
+def msgFile = new File(msgFileName)
+
+// Read commit message from file.
+def commitMessage = msgFile.text
+
+/**
+ * 提交规范
+ * 包含 {header}、{body}、{footer}
+ * 其中 {header} 必须，{body} 和 {footer} 可选
+ *
+ * 格式：
+ * 1.{header}、{body}、{footer}三者之间要用一个空行"\n\n"区分
+ * 2.每个部分不得超过 100 个字,每个部分不能以空格开始或结束
+ * 3.{header} 必须包含两个部分  type:subject 使用冒号区分
+ * 4.type 必须是以下类型的一种(不区分大小写)
+ *      --feat:新增功能(feature)
+ *      --mod:修改功能
+ *      --fix:修复bug
+ *      --docs:文档(documentation)
+ *      --style:格式(不影响代码运行的变动)
+ *      --refactor:重构(即不是新增功能，也不是修改bug的代码变动)
+ *      --perf:性能优化
+ *      --test:增加测试
+ *      --chore:构建过程或辅助工具的变动
+ * 5.subject 是对 commit 的描述
+ * 6.{type}和{type}不能以空格开始或结束
+ */
+
+//中文可能出现乱码。
+def maxChar = 100
+
+def templateEachLineError = "{Header},{Body},{Footer} each part must not exceed" + maxChar + "words"
+
+def templateTypeSubjectCheck = "{Type}:{Subject} wrong format"
+
+def templateSubjectError = "{Subject} wrong format"
+
+def templateSpaceError = "Cannot begin or end with spaces"
+
+def templateError = "Incorrect Submission Format\n" +
+        "{Type}:{Subject}\n\n" +
+        "{Body} \n\n" +
+        "{Footer}"
+
+def templateTypeError = "{Type} must be of the following type(IgnoreCase)\n" +
+        "    --feat: 新增功能(feature)\n" +
+        "    --mod: 修改功能(modify)\n" +
+        "    --fix:修复bug\n" +
+        "    --docs:文档(documentation)\n" +
+        "    --style:格式(不影响代码运行的变动)\n" +
+        "    --refactor:重构(即不是新增功能，也不是修改bug的代码变动)\n" +
+        "    --perf:性能优化\n" +
+        "    --test:增加测试\n" +
+        "    --chore:构建过程或辅助工具的变动\n"
+
+//过滤第一个空行
+if (commitMessage.startsWith("\n")) {
+    commitMessage = commitMessage.replaceFirst("\n", "")
+}
+//过滤分支合并
+if (commitMessage.startsWith("Merge branch")) {
+    println(commitMessage)
+    exit 0
+}
+def lines = commitMessage.split("\n")
+//过滤以"#"开头的信息
+def stringBuilder = new StringBuilder()
+for (int i = 0; i < lines.length; i++) {
+    def item = lines[i]
+    if (!item.startsWith("#")) {
+        stringBuilder.append(item).append("\n")
+    }
+}
+
+def formatedMessage = stringBuilder.toString()
+def inputs = formatedMessage.split("\n\n")
+
+if (inputs.length > 3) {
+    println(templateError)
+    exit(1)
+}
+
+static def switchHBF(int i) {
+    switch (i) {
+        case 0:
+            return "{Header}"
+        case 1:
+            return "{Body}"
+        case 2:
+            return "{Footer}"
+    }
+}
+
+for (int i = 0; i < inputs.length; i++) {
+    def hbf = inputs[i]
+    if (hbf.length() > maxChar) {
+        println(templateEachLineError)
+        print(switchHBF(i) + "the number of characters is wrong" + "(" + hbf.length() + ")")
+        exit(1)
+    }
+    if (hbf.startsWith(" ") || hbf.endsWith(" ")) {
+        println(templateSpaceError)
+        exit(1)
+    }
+}
+
+def head = inputs[0].split(":")
+if (head.length != 2) {
+    print(templateTypeSubjectCheck)
+    exit(1)
+}
+def type = head[0]
+def subject = head[1]
+def types = ["feat", "fix", "style", "refactor", "perf", "test", "docs", "chore", "mod"]
+
+if (subject.isEmpty() || subject.startsWith(" ") || subject.endsWith(" ")) {
+    print(templateSubjectError)
+    exit(1)
+}
+
+def isContainsType = false
+
+types.any {
+    if (it.equalsIgnoreCase(type)) {
+        isContainsType = true
+        return
+    }
+}
+
+if (!isContainsType) {
+    print(templateTypeError)
+    exit(1)
+}
+println(formatedMessage)
+exit 0

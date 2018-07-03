@@ -1,0 +1,332 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE module PUBLIC
+    "-//Puppy Crawl//DTD Check Configuration 1.2//EN"
+    "http://www.puppycrawl.com/dtds/configuration_1_2.dtd">
+
+<!--/**
+ * @author Kongjian
+ * @createTime 2018/6/14
+ * @description 在编码的过程中，经常使用ctrl+alt+o;ctrl+alt+L格式化你的导入包名和代码
+ * 参考: checkStyle官方翻译: https://blog.csdn.net/lzs109/article/details/46008667
+ */-->
+
+<!--检查器，根配置模块，不可删除-->
+<module name="Checker">
+
+    <!--编码-->
+    <property name="charset" value="UTF-8" />
+
+    <!--提示级别，默认warning-->
+    <property name="severity" value="warning" />
+    <!--<property name="severity" value="error" />-->
+
+    <!--检查文件的长度(行) 默认不超过2000行-->
+    <module name="FileLength">
+        <property name="severity" value="error" />
+        <property name="max" value="2000" />
+    </module>
+
+    <module name="TreeWalker">
+
+        <!--必须导入类的完整路径，即不能使用*导入所需的类-->
+        <module name="AvoidStarImport">
+            <property name="severity" value="error" />
+        </module>
+
+        <!--检查是否导入了指定的非法包。
+            默认情况下，这项检查会拒绝所有的sun.*包，因为直接使用sun.*包的程序肯定不是100%的纯Java程序。
+            想要拒绝其他的包，将illegalPkgs属性设置为你指定的非法包列表即可。-->
+        <module name="IllegalImport">
+            <property name="severity" value="error" />
+        </module>
+
+        <!--检查是否导入了不必显示导入的类，辟如java.lang包下的类不需要导入-->
+        <module name="RedundantImport" />
+
+        <!--检查是否导入的包没有使用-->
+        <module name="UnusedImports">
+            <property name="severity" value="error" />
+        </module>
+
+        <!--空格检查-->
+        <!--<module name="EmptyForIteratorPad" />-->
+        <!--<module name="MethodParamPad" />-->
+        <!--<module name="NoWhitespaceAfter" />-->
+        <!--<module name="NoWhitespaceBefore" />-->
+        <!--<module name="OperatorWrap" />-->
+        <!--<module name="ParenPad" />-->
+        <!--<module name="TypecastParenPad" />-->
+        <!--<module name="WhitespaceAfter" />-->
+        <!--<module name="WhitespaceAround" />-->
+
+
+        <!--检查类和接口的javadoc 默认不检查author 和version tags
+            authorFormat: 检查author标签的格式
+            versionFormat: 检查version标签的格式
+            scope: 可以检查的类的范围，例如：public只能检查public修饰的类，private可以检查所有的类
+            excludeScope: 不能检查的类的范围，例如：public，public的类将不被检查，但访问权限小于public的类仍然会检查，其他的权限以此类推
+            tokens: 该属性适用的类型，例如：CLASS_DEF,INTERFACE_DEF -->
+        <!--<module name="JavadocType">-->
+        <!--&lt;!&ndash;<property name="authorFormat" value="\S" />&ndash;&gt;-->
+        <!--&lt;!&ndash;<property name="scope" value="protected" />&ndash;&gt;-->
+        <!--<property name="tokens" value="CLASS_DEF,INTERFACE_DEF" />-->
+        <!--</module>-->
+
+        <!--检查方法的javadoc的注释
+            scope: 可以检查的方法的范围，例如：public只能检查public修饰的方法，private可以检查所有的方法
+            allowMissingParamTags: 是否忽略对参数注释的检查
+            allowMissingThrowsTags: 是否忽略对throws注释的检查
+            allowMissingReturnTag: 是否忽略对return注释的检查 -->
+        <module name="JavadocMethod">
+            <property name="scope" value="private" />
+            <property name="allowMissingParamTags" value="false" />
+            <property name="allowMissingThrowsTags" value="false" />
+            <property name="allowMissingReturnTag" value="false" />
+            <property name="tokens" value="METHOD_DEF" />
+            <property name="allowUndeclaredRTE" value="true" />
+            <property name="allowThrowsTagsForSubclasses" value="true" />
+            <!--允许get set 方法没有注释-->
+            <property name="allowMissingPropertyJavadoc" value="true" />
+        </module>
+
+        <!--检查类变量的注释
+            scope: 检查变量的范围，例如：public只能检查public修饰的变量，private可以检查所有的变量 -->
+        <module name="JavadocVariable">
+            <property name="scope" value="public" />
+        </module>
+
+        <!--检查左大括号规范
+            option: 定义左大括号'{'显示位置，eol在同一行显示，nl在下一行显示
+            maxLineLength: 大括号'{'所在行行最多容纳的字符数
+            tokens: 该属性适用的类型，例：CLASS_DEF,INTERFACE_DEF,METHOD_DEF,CTOR_DEF -->
+        <module name="LeftCurly">
+            <property name="option" value="eol" />
+            <property name="tokens" value="CLASS_DEF,INTERFACE_DEF,METHOD_DEF" />
+        </module>
+
+        <!--NeedBraces 检查是否应该使用括号的地方没有加括号
+            tokens: 定义检查的类型 -->
+        <module name="NeedBraces">
+            <property name="severity" value="error" />
+        </module>
+
+        <!--检查右大括号'}'规范
+            option: 右大括号是否单独一行显示
+            tokens: 定义检查的类型  -->
+        <module name="RightCurly">
+            <property name="option" value="alone" />
+            <property name="tokens" value="CLASS_DEF,INTERFACE_DEF,METHOD_DEF" />
+        </module>
+
+        <!--检查在重写了equals方法后是否重写了hashCode方法-->
+        <module name="EqualsHashCode" />
+
+        <!--检查是否有不合法的实例化操作，是否使用工厂方法更好。
+            解释：根据不同的项目，对于某些类来说，可能通过工厂方法来创建类实例更好，而不是调用类构造器。
+            辟如一个简单的示例就是java.lang.Boolean类。为了节省内存和CPU周期，最好使用预定义的常量TRUE和FALSE。构造器的调用应当被替换为调用Boolean.valueOf()方法。而非new Boolean();-->
+        <module name="IllegalInstantiation" />
+
+        <!--局部变量名称final-->
+        <module name="LocalFinalVariableName" />
+
+        <!--局部变量名称-->
+        <module name="LocalVariableName" />
+
+        <!--成员变量名称static,non-final
+            规则：纯大写可包含数组，以_拼接，不可超过30个字符-->
+        <module name="StaticVariableName">
+            <property name="format" value="(^[A-Z0-9_]{0,30}$)" />
+        </module>
+
+        <!--包名称
+            规则：纯小写可包含数字-->
+        <module name="PackageName">
+            <property name="format" value="^[a-z]+(\.[a-z][a-z0-9]*)*$" />
+        </module>
+
+        <!--类，接口名称
+            规则：大写字母开头，驼峰式，可包含数字，不超过50个字符-->
+        <module name="TypeName">
+            <property name="format" value="(^[A-Z][a-zA-Z0-9]{0,50}$)" />
+        </module>
+
+        <!--方法名称
+            规则：小写字母开头，驼峰式，可包含数字，不超过50个字符-->
+        <module name="MethodName">
+            <property name="format" value="(^[a-z][a-zA-Z0-9]{0,50}$)" />
+        </module>
+
+        <!--成员变量名称non-static
+            规则：以m开头,驼峰式，可包含数字，不超过50字符-->
+        <module name="MemberName">
+            <property name="format" value="(^[m][A-Z0-9][a-zA-Z0-9]{0,50}$)" />
+        </module>
+
+        <!--方法参数名称
+            规则：小写字母开头，驼峰式，可包含数字，不超过50字符-->
+        <module name="ParameterName">
+            <property name="format" value="(^[a-z][a-zA-Z0-9_]{0,50}$)" />
+        </module>
+
+        <!--常量名称(static, final fields)-->
+        <module name="ConstantName">
+            <property name="format" value="(^[A-Z0-9_]{0,50}$)" />
+        </module>
+
+        <!--代码缩进-->
+        <module name="Indentation" />
+
+        <!--检查throws子句中是否声明了多余的异常，例如重复异常、未检查的异常或一个已声明抛出的异常的子类。-->
+        <module name="RedundantThrows">
+            <property name="logLoadErrors" value="true" />
+            <property name="suppressLoadErrors" value="true" />
+        </module>
+
+        <!--是否出现简化过于复杂的布尔表达式
+            解释：复杂的布尔逻辑会使得代码难以理解和维护。-->
+        <module name="SimplifyBooleanExpression" />
+
+        <!--检查是否有过于复杂的布尔类型return语句。例如下面的代码：
+            if (valid())
+                return false;
+            else
+                return true;
+            可以写成：
+            return !valid();
+            这项检查是从PMD规则中借鉴而来的。-->
+        <module name="SimplifyBooleanReturn" />
+
+        <!--检查一个只有私有构造器的类是否被声明为final-->
+        <module name="FinalClass" />
+
+        <!--确保工具类（在API中只有静态方法和字段的类）没有任何公有构造器。
+            解释：实例化工具类没有任何意义。因此，工具类的构造器应当是私有的或者受保护的（如果你打算以后扩展子类）。一个常见的错误便是忘记隐藏默认构造器。
+
+            如果你打算将工具类的构造器声明为受保护的，那么你可以考虑下面的构造器实现技术，借此可以禁止子类的实例化：
+            public class StringUtils // 不是final类，允许子类继承
+            {
+                protected StringUtils() {
+                    throw new UnsupportedOperationException(); // 防止子类调用
+                }
+
+                public static int count(char c, String s) {
+                    // ...
+                }
+            }-->
+        <module name="HideUtilityClassConstructor">
+            <property name="severity" value="error" />
+        </module>
+
+        <!--检查类成员的可见性。只有static final的类成员可以是公有的，其他的类成员必须是私有的，除非设置了protectedAllowed属性或packageAllowed属性。
+            如果类成员的名称和指定的公有成员正则表达式匹配，那么这项检查就不会标记这个类成员（默认包含“^serialVersionUID$”）。
+            解释：强制封装-->
+        <module name="VisibilityModifier" />
+
+        <!-- 每一行只能定义一个变量 -->
+        <module name="MultipleVariableDeclarations">
+            <property name="severity" value="error" />
+        </module>
+
+        <!--检查再定义数组时，采用java风格还是c风格，例如：int[] num是java风格，int num[]是c风格。默认是java风格&ndash;&gt;-->
+        <module name="ArrayTypeStyle" />
+
+        <!--检查代码中是否含有“幻数”，幻数就是没有被定义为常量的数值文字。默认情况下，-1、0、1、2不会被认为是幻数。
+            避免硬编码-->
+        <module name="MagicNumber" />
+
+        <!-- A check for TODO: comments. Actually it is a generic regular expression matcher on Java comments. To check for other patterns in Java comments, set property format.
+           检查是否存在TODO（待处理） TODO是javaIDE自动生成的。一般代码写完后要去掉。
+         -->
+        <module name="TodoComment" />
+
+        <!--检查long类型的常量在定义时是否由大写的“L”开头。注意，是“L”，不是“l”。
+            这是由《Java Language Specification》的第3.10.1章节所建议的编码规约。
+
+            解释：小写字母“l”看起来非常像数字“1”。-->
+        <module name="UpperEll" />
+
+        <!--检查switch语句是否含有default子句。
+            解释：在每个switch语句中引入一条默认分支通常是一个很好的主意。
+            即使开发者确信所有当前可能的分支都能覆盖到，这也应当在default分支中表达出来，例如，使用一条断言。
+            这种方法使得代码可以应付以后的修改，例如，在一个枚举类型中引入新的类型。-->
+        <module name="MissingSwitchDefault">
+            <property name="severity" value="error" />
+        </module>
+
+        <!--检查switch语句中是否存在跨越分支。如果一个case分支的代码中缺少break、return、throw或continue语句，那么就会导致跨越分支。
+            这项检查可以通过特殊的注释以抑制警告。默认情况下，在有跨越分支的case分支代码中添加“fallthru”、“fall through”、“fallthrough”、“falls through”、“fallsthrough”等注释（区分大小写）时，便可抑制警告。包含以上单词的注释必须在一行中，并且必须在当前case分支代码的最后一行中，或者与case语句在同一行，如以下代码所示：
+            switch (i){
+            case 0:
+                i++; // fall through
+
+            case 1:
+                i++;
+                // falls through
+            case 2: {
+                i++;
+            }
+            // fallthrough
+            case 3:
+                i++;
+            /* fallthru */case 4:
+                i++
+                break;
+            }
+            注意：这项检查假设case分支代码中没有不可达的代码。-->
+        <module name="FallThrough">
+            <property name="severity" value="error" />
+        </module>
+
+        <!--检查方法参数,或者构造函数内参数个数-->
+        <module name="ParameterNumber">
+            <property name="max" value="5" />
+        </module>
+
+        <!--每行字符数-->
+        <module name="LineLength">
+            <property name="max" value="200" />
+        </module>
+
+        <!--检查方法和构造器的长度。
+            解释：如果一个方法变得非常长，那么就会难以理解。因此，过长的方法通常应当被重构成若干个较小的独立的方法，每个方法专注于一个特定的任务。-->
+        <module name="MethodLength">
+            <property name="max" value="300" />
+        </module>
+
+        <!--ModifierOrder 检查修饰符的顺序，默认是 public,protected,private,abstract,static,final,transient,volatile,synchronized,native-->
+        <module name="ModifierOrder" />
+
+        <!--在以下部分检查是否有多余的修饰符：
+            1. 接口和注解的定义；
+            2. final类的方法的final修饰符；
+            3. 被声明为static的内部接口声明。
+
+            解释：《Java Language Specification》强烈不建议在接口定义中使用“public”和“abstract”来声明方法。
+
+            接口中的变量和注解默认就是public、static、final的，因此，这些修饰符也是多余的。
+
+            因为注解是接口的一种形式，所以它们的字段默认也是public、static、final的，正如它们的注解字段默认是public和abstract的。
+
+            定义为final的类是不能被继承的，因此，final类的方法的final修饰符也是多余的。-->
+        <module name="RedundantModifier" />
+
+        <!---字符串比较必须使用 equals()-->
+        <module name="StringLiteralEquality" />
+
+        <!--if-else嵌套语句个数 最多4层-->
+        <module name="NestedIfDepth">
+            <property name="max" value="4" />
+        </module>
+
+        <!--try-catch 嵌套语句个数 最多2层-->
+        <module name="NestedTryDepth">
+            <property name="max" value="2" />
+        </module>
+
+        <!--限制return语句的数量。默认值为2。可以忽略检查指定的方法（默认忽略equals()方法）。
+            解释：过多的返回点可能表明代码尝试处理过多的业务，可能会难以理解。-->
+        <module name="ReturnCount">
+            <property name="max" value="5" />
+            <property name="format" value="^$" />
+        </module>
+    </module>
+</module>

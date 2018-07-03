@@ -1,0 +1,114 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+
+buildscript {
+
+    repositories {
+        google()
+        jcenter()
+    }
+
+    apply plugin: 'checkstyle'
+
+    dependencies {
+        classpath 'com.android.tools.build:gradle:3.1.3'
+
+        // NOTE: Do not place your application dependencies here; they belong
+        // in the individual module build.gradle files
+    }
+}
+
+/**
+ * 3.x以后的Gradle版本需要配置checkStyle版本对应。
+ * 参考：https://discuss.gradle.org/t/checkstyle-checker-cannot-be-created-with-gradle-3-5/22474
+ */
+checkstyle {
+    toolVersion = '5.9'
+}
+
+allprojects {
+    repositories {
+        google()
+        jcenter()
+    }
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}
+
+/**
+ * @return 本地差异文件
+ */
+def getChangeFiles() {
+    String changeInfo = null
+    try {
+        changeInfo = 'git status -s'.execute(null, project.rootDir).text.trim()
+    } catch (Exception e) {
+        e.printStackTrace()
+    }
+    return changeInfo == null ? "" : changeInfo
+}
+
+/**
+ * @param gitstatusinfo
+ * @return 过滤差异文件中的java文件
+ */
+static def filterCommitter(String gitstatusinfo) {
+    ArrayList<String> filterList = new ArrayList<String>()
+    String[] lines = gitstatusinfo.split("\\n")
+    for (String line : lines) {
+        if (line.contains(".java")) {
+            String[] spliters = line.trim().split(" ")
+            for (String str : spliters) {
+                if (str.contains(".java")) {
+                    filterList.add(str)
+                }
+            }
+        }
+    }
+    return filterList
+}
+
+/**
+ * 指定检查项
+ */
+task checkstyle(type: Checkstyle) {
+    source 'app/src/main/java'
+
+    exclude '**/gen/**'
+    exclude '**/R.java'
+    exclude '**/BuildConfig.java'
+
+    if (project.hasProperty('checkCommit') && project.property("checkCommit")) {
+        def changeFiles = filterCommitter(getChangeFiles())
+        println()
+        println("----changeFiles---- ")
+        def includeList = new ArrayList<String>()
+        for (int i = 0; i < changeFiles.size(); i++) {
+            String spliter = changeFiles.getAt(i)
+            println(spliter)
+            String[] spliterlist = spliter.split("/")
+            String fileName = spliterlist[spliterlist.length - 1]
+            includeList.add("**/" + fileName)
+        }
+        println()
+        if (includeList.size() == 0) {
+            exclude '**/*.java'
+        } else {
+            include includeList
+        }
+    } else {
+        include '**/*.java'
+    }
+    configFile rootProject.file('./gitHooks/checkstyle.xml')
+    classpath = files()
+}
+
+/**
+ * 将脚本复制到本地仓库.git下
+ */
+task copyGithookScriptToLocalDir(type: Copy) {
+    from 'gitHooks/localScript'
+    into '.git/hooks'
+}
+

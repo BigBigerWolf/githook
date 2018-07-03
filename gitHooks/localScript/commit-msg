@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+current_repo_path=$(git rev-parse --show-toplevel)
+
+$current_repo_path/gitHooks/format_commit-msg $1
