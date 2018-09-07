@@ -104,11 +104,3 @@ task checkstyle(type: Checkstyle) {
     classpath = files()
 }
 
-/**
- * 将脚本复制到本地仓库.git下
- */
-task copyGithookScriptToLocalDir(type: Copy) {
-    from 'gitHooks/localScript'
-    into '.git/hooks'
-}
-

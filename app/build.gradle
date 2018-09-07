@@ -18,6 +18,32 @@ android {
     }
 }
 
+/**
+ * 将脚本复制到本地仓库.git下
+ */
+task copyGithookScriptToLocalDir(type: Copy) {
+    if ((new File('../.git/hooks/commit-msg').exists()) && (new File('../.git/hooks/pre-commit').exists())) {
+        return
+    }
+
+//    def isMacOrLinux = org.gradle.internal.os.OperatingSystem.current().isMacOsX() || org.gradle.internal.os.OperatingSystem.current().isLinux()
+//    if (isMacOrLinux) {
+//        "chmod +x " + new File('../gitHooks/localScript/commit-msg').name.execute()
+//        "chmod +x " + new File('../gitHooks/localScript/commit-msg').name.execute()
+//    }
+
+    from '../gitHooks/localScript'
+    into '../.git/hooks'
+}
+
+afterEvaluate {
+    tasks.matching {
+        it.name.startsWith('process') && (it.name.endsWith('ReleaseJavaRes') || it.name.endsWith('DebugJavaRes'))
+    }.each { task ->
+        task.dependsOn(copyGithookScriptToLocalDir)  // 任务依赖：执行task之前需要执行dependsOn指定的任务
+    }
+}
+
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.android.support:appcompat-v7:27.1.1'
